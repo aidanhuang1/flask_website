@@ -80,6 +80,8 @@ def login():
         except:
             flash('failed to login')        
     
+    return render_template('login.html')
+
 @app.route('/user', methods=['POST', 'GET'])
 def user():
     email = None
