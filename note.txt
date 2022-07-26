@@ -1,0 +1,5 @@
+1. creating a new user through firebase authentication if the user doesn't exist already will send the update to firebase users
+2. creating a new user will also update the sql database
+
+Note: firebase is only used for user authentication (email and password)
+

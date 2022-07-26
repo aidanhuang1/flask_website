@@ -53,27 +53,17 @@ def view():
 def login():
     if 'user' in session:
         flash("Already logged in")
+        print(auth.current_user)
         return redirect(url_for('user'))
+        
     if request.method == 'POST':
         session.permanent = True
-        # user = request.form['nm']
-        # session['user'] = user 
-        
-        # found_user = users.query.filter_by(name=user).first()
-        # if found_user: 
-        #     #user is found in database
-        #     session['email'] = found_user.email
-        # else: 
-        #     #if user doesn't exist in database
-        #     usr = users(user, '')
-        #     db.session.add(usr)
-        #     db.session.commit()
+
         email = request.form.get('email')
         password = request.form.get('password') 
         try:
             user = auth.sign_in_with_email_and_password(email, password)
             session['user'] = email
-            print(user)
             
             flash('login successful!')
             return redirect(url_for('user'))
@@ -82,11 +72,34 @@ def login():
     
     return render_template('login.html')
 
+@app.route('/newuser', methods=['POST', 'GET'])
+def newuser():
+    if request.method=='POST':
+        email = request.form.get('email')
+        password = request.form.get('password') 
+        if email is None or password is None:
+            return {'message': 'Error missing email or password'},400
+        try:
+            user = auth.create_user_with_email_and_password(email=email, password=password)
+            
+            #if user doesn't exist in database
+            usr = users(email, email) #creates new object
+            db.session.add(usr)
+            db.session.commit()
+            flash('created user')
+            return redirect(url_for('user'))
+        except:
+            flash('failed to create user')
+    return render_template('newuser.html')
+        
+
+
 @app.route('/user', methods=['POST', 'GET'])
 def user():
     email = None
     if 'user' in session:
         user = session['user']        
+        print(user)
         if request.method == 'POST':
             email = request.form['email']
             session['email'] = email
